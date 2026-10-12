@@ -2,3 +2,5 @@ __pycache__/
 *.py[cod]
 .venv/
 .streamlit/secrets.toml
+workspace_data/
+tmp/
