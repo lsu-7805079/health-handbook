@@ -9,14 +9,18 @@ import pymupdf
 import numpy as np
 from PIL import Image
 from pypdf import PdfReader
-from rapidocr_onnxruntime import RapidOCR
-
-
 MAX_PDF_PAGES = 30
 
 
 @lru_cache(maxsize=1)
-def get_ocr_engine() -> RapidOCR:
+def get_ocr_engine() -> Any:
+    try:
+        from rapidocr_onnxruntime import RapidOCR
+    except (ImportError, OSError) as exc:
+        raise RuntimeError(
+            "当前云端环境暂不支持图片 OCR。请上传包含可复制文字的 PDF，"
+            "或先在本地完成脱敏后粘贴报告文本。"
+        ) from exc
     return RapidOCR()
 
 
