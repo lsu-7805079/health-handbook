@@ -87,6 +87,11 @@ st.markdown(
     .card {padding: 1rem 1.1rem; border: 1px solid #e4ebe6; border-radius: 14px; background: white; min-height: 128px;}
     .eyebrow {font-size: .78rem; color: #6b8175; letter-spacing: .08em; text-transform: uppercase;}
     .big-number {font-size: 1.8rem; font-weight: 700; color: #173b2b; margin: .3rem 0;}
+    @media (max-width: 640px) {
+        .block-container {padding: 1rem .8rem 2.5rem;}
+        [data-testid="stFileUploader"] section {min-height: 7rem;}
+        [data-testid="stFileUploader"] button {min-height: 2.8rem; font-size: 1rem;}
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -95,9 +100,12 @@ st.markdown(
 with st.sidebar:
     st.markdown("### 🌿 健康工作台")
     st.caption("数据仅保留在当前浏览器会话中，关闭后自动清除")
+    requested_page = st.query_params.get("page", "")
+    default_page_index = 1 if requested_page == "report" else 0
     page = st.radio(
         "导航",
         ["工作台首页", "体检报告", "血压评估", "健康记录", "工作台设置"],
+        index=default_page_index,
         label_visibility="collapsed",
     )
     st.divider()
@@ -135,14 +143,18 @@ if page == "工作台首页":
 
 elif page == "体检报告":
     st.title("体检报告")
-    st.caption("支持 PDF、JPG、JPEG 和 PNG。文件仅在当前服务器会话中处理，所有结果都需要人工核对。")
+    st.info(
+        "📱 微信上传：在微信中打开本页面，点击下方按钮，然后选择手机里的 PDF 或报告照片。"
+    )
+    st.caption("支持 PDF、JPG、JPEG 和 PNG。单个文件最大 20 MB；PDF 最多处理 30 页。")
     st.warning("建议先在本地删除姓名、身份证号、电话、住址和病历号。请勿上传不愿交由服务器处理的敏感报告。")
 
     uploaded_report = st.file_uploader(
-        "上传体检报告",
+        "从微信或手机选择体检报告",
         type=["pdf", "jpg", "jpeg", "png"],
-        help="单个文件最大 20 MB；PDF 最多处理 30 页。",
+        help="点击后可从手机文件、相册或微信保存的文件中选择。",
     )
+    st.caption("如果报告在微信聊天里，请先长按文件或图片保存到手机，再回到这里选择上传。")
     if uploaded_report:
         file_bytes = uploaded_report.getvalue()
         file_size_mb = len(file_bytes) / 1024 / 1024
